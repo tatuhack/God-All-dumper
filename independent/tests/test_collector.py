@@ -11,7 +11,7 @@ class CollectorTests(unittest.TestCase):
     def setUpClass(cls):
         cls.tmp=tempfile.TemporaryDirectory()
         d=Path(cls.tmp.name)
-        subprocess.run(['cc','-shared','-fPIC','-Wall','-Wextra','-Werror','-DPXO_OUTPUT_LIMIT=4096',str(ROOT/'src/collector.c'),'-ldl','-o',str(d/'collector.so')],check=True)
+        subprocess.run(['cc','-shared','-fPIC','-Wall','-Wextra','-Werror','-DPXO_OUTPUT_LIMIT=4096',str(ROOT/'src/collector.c'),str(ROOT/'src/native_offsets.c'),'-ldl','-o',str(d/'collector.so')],check=True)
         subprocess.run(['cc','-shared','-fPIC','-Wall','-Wextra','-Werror',str(ROOT/'tests/mock_runtime.c'),'-o',str(d/'runtime.so')],check=True)
         cls.collector=ctypes.CDLL(str(d/'collector.so'))
         cls.runtime=ctypes.CDLL(str(d/'runtime.so'))
@@ -54,6 +54,53 @@ class CollectorTests(unittest.TestCase):
             self.assertTrue(data['partial'])
             self.assertLess(data['record_count'],100)
             self.assertLess(sum(p.stat().st_size for p in Path(d).iterdir()),8192)
+
+    def test_native_offsets_from_both_layouts(self):
+        for mode,profile in [(5,'2020.3-compatible-8ptr'),(6,'2022.3-compatible-9ptr')]:
+            self.runtime.mock_mode(mode)
+            with tempfile.TemporaryDirectory() as d:
+                self.assertEqual(self.call(d)[0],0)
+                result=json.loads(next(Path(d).glob('*.json')).read_text())
+                method=result['records'][1]
+                actual=ctypes.cast(self.runtime.mock_body,ctypes.c_void_p).value
+                self.assertEqual(int(method['native_address'],16),actual)
+                self.assertEqual(int(method['image_base'],16)+int(method['native_offset'],16),actual)
+                self.assertEqual(int(method['elf_load_bias'],16)+int(method['elf_virtual_address'],16),actual)
+                self.assertEqual(method['offset_profile'],profile)
+                self.assertEqual(method['offset_confidence'],'conditional_on_runtime_layout')
+                self.assertIsNotNone(method['elf_file_offset'])
+                self.assertEqual(result['native_offsets_validated'],1)
+
+    def test_nonzero_vaddr_loaded_elf_uses_rva_not_elf_value(self):
+        d=Path(self.tmp.name)
+        path=d/'nonzero.so'
+        subprocess.run(['cc','-shared','-fPIC','-Wl,-Ttext-segment=0x10000000',str(ROOT/'tests/mock_runtime.c'),'-o',str(path)],check=True)
+        runtime=ctypes.CDLL(str(path));runtime.mock_mode(5)
+        with tempfile.TemporaryDirectory() as out:
+            self.assertEqual(self.call(out,handle=runtime._handle)[0],0)
+            method=json.loads(next(Path(out).glob('*.json')).read_text())['records'][1]
+            actual=ctypes.cast(runtime.mock_body,ctypes.c_void_p).value
+            self.assertEqual(int(method['native_address'],16),actual)
+            self.assertEqual(int(method['image_base'],16),0x10000000)
+            self.assertEqual(int(method['elf_load_bias'],16),0)
+            self.assertEqual(int(method['native_offset'],16),actual-0x10000000)
+            self.assertEqual(int(method['elf_virtual_address'],16),actual)
+
+    def test_native_rejections_are_explicit(self):
+        for mode,reason in [(7,'pointer_not_executable'),(8,'null_method_pointer'),(9,'unsupported_or_mismatched_layout')]:
+            self.runtime.mock_mode(mode)
+            with tempfile.TemporaryDirectory() as d:
+                self.assertEqual(self.call(d)[0],0)
+                method=json.loads(next(Path(d).glob('*.json')).read_text())['records'][1]
+                self.assertIsNone(method['native_offset']);self.assertEqual(method['offset_status'],reason)
+
+    def test_pointer_in_other_module_uses_actual_owner(self):
+        self.runtime.mock_mode(11)
+        with tempfile.TemporaryDirectory() as d:
+            self.assertEqual(self.call(d)[0],0)
+            method=json.loads(next(Path(d).glob('*.json')).read_text())['records'][1]
+            self.assertIn('libc',method['native_module'])
+            self.assertNotIn('runtime.so',method['native_module'])
 
     def test_record_limit(self):
         with tempfile.TemporaryDirectory() as d:

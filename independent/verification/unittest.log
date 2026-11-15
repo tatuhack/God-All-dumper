@@ -1,9 +1,13 @@
 test_bad_output_path (test_collector.CollectorTests.test_bad_output_path) ... ok
 test_metadata_and_mock_api_field_offset (test_collector.CollectorTests.test_metadata_and_mock_api_field_offset) ... ok
 test_missing_exports (test_collector.CollectorTests.test_missing_exports) ... ok
+test_native_offsets_from_both_layouts (test_collector.CollectorTests.test_native_offsets_from_both_layouts) ... ok
+test_native_rejections_are_explicit (test_collector.CollectorTests.test_native_rejections_are_explicit) ... ok
 test_nested_class_names_are_not_ambiguous (test_collector.CollectorTests.test_nested_class_names_are_not_ambiguous) ... ok
+test_nonzero_vaddr_loaded_elf_uses_rva_not_elf_value (test_collector.CollectorTests.test_nonzero_vaddr_loaded_elf_uses_rva_not_elf_value) ... ok
 test_not_ready_produces_no_files (test_collector.CollectorTests.test_not_ready_produces_no_files) ... ok
 test_output_limit_stops_nonterminating_iterator (test_collector.CollectorTests.test_output_limit_stops_nonterminating_iterator) ... ok
+test_pointer_in_other_module_uses_actual_owner (test_collector.CollectorTests.test_pointer_in_other_module_uses_actual_owner) ... ok
 test_record_limit (test_collector.CollectorTests.test_record_limit) ... ok
 test_zero_budget (test_collector.CollectorTests.test_zero_budget) ... ok
 test_distribution_brand_and_limits (test_distribution.DistributionTests.test_distribution_brand_and_limits) ... ok
@@ -11,8 +15,16 @@ test_module_archive_layout (test_distribution.DistributionTests.test_module_arch
 test_sdk_integrity (test_distribution.DistributionTests.test_sdk_integrity) ... ok
 test_shell_syntax (test_distribution.DistributionTests.test_shell_syntax) ... ok
 test_shell_validation_with_mock_properties (test_distribution.DistributionTests.test_shell_validation_with_mock_properties) ... ok
+test_both_layouts_and_pointer_widths (test_offsets.OffsetTests.test_both_layouts_and_pointer_widths) ... ok
+test_boundaries_bss_and_overflow (test_offsets.OffsetTests.test_boundaries_bss_and_overflow) ... ok
+test_each_validation_field_rejected (test_offsets.OffsetTests.test_each_validation_field_rejected) ... ok
+test_missing_validation_preserves_unavailable (test_offsets.OffsetTests.test_missing_validation_preserves_unavailable) ... ok
+test_nonzero_image_vaddr_and_file_offset (test_offsets.OffsetTests.test_nonzero_image_vaddr_and_file_offset) ... ok
+test_short_read_unsupported_tail_and_ambiguity (test_offsets.OffsetTests.test_short_read_unsupported_tail_and_ambiguity) ... ok
+test_thumb_only_on_arm32 (test_offsets.OffsetTests.test_thumb_only_on_arm32) ... ok
+test_unreadable_record_does_not_crash (test_offsets.OffsetTests.test_unreadable_record_does_not_crash) ... ok
 
 ----------------------------------------------------------------------
-Ran 13 tests in 0.171s
+Ran 25 tests in 0.561s
 
 OK

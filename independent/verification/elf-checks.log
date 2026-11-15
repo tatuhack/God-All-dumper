@@ -6,7 +6,7 @@
   0x0000000000000001 (NEEDED)       Shared library: [libstdc++.so]
   0x0000000000000001 (NEEDED)       Shared library: [libm.so]
   0x0000000000000001 (NEEDED)       Shared library: [libc.so]
-    32: 0000000000001a34   228 FUNC    GLOBAL DEFAULT    13 zygisk_module_entry
+    45: 000000000000255c   228 FUNC    GLOBAL DEFAULT    13 zygisk_module_entry
 === armeabi-v7a ===
   Class:                             ELF32
   Machine:                           ARM
@@ -15,7 +15,7 @@
   0x00000001 (NEEDED)       Shared library: [libstdc++.so]
   0x00000001 (NEEDED)       Shared library: [libm.so]
   0x00000001 (NEEDED)       Shared library: [libc.so]
-    33: 000012bd   204 FUNC    GLOBAL DEFAULT    13 zygisk_module_entry
+    45: 000019f5   204 FUNC    GLOBAL DEFAULT    13 zygisk_module_entry
 === x86 ===
   Class:                             ELF32
   Machine:                           Intel 80386
@@ -24,7 +24,7 @@
   0x00000001 (NEEDED)       Shared library: [libstdc++.so]
   0x00000001 (NEEDED)       Shared library: [libm.so]
   0x00000001 (NEEDED)       Shared library: [libc.so]
-    33: 00001620   207 FUNC    GLOBAL DEFAULT    13 zygisk_module_entry
+    45: 00001e80   207 FUNC    GLOBAL DEFAULT    13 zygisk_module_entry
 === x86_64 ===
   Class:                             ELF64
   Machine:                           Advanced Micro Devices X86-64
@@ -33,4 +33,4 @@
   0x0000000000000001 (NEEDED)       Shared library: [libstdc++.so]
   0x0000000000000001 (NEEDED)       Shared library: [libm.so]
   0x0000000000000001 (NEEDED)       Shared library: [libc.so]
-    33: 00000000000019f0   201 FUNC    GLOBAL DEFAULT    13 zygisk_module_entry
+    45: 00000000000023d0   201 FUNC    GLOBAL DEFAULT    13 zygisk_module_entry

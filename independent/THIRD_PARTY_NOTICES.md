@@ -17,9 +17,7 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 
-Collector, configuration UI, scripts, tests and packaging in this directory
-were written anew for pxojdumper; they do not incorporate an existing dumper's
-source files, private runtime structures, xDL or WebUI helper libraries.
-This is not a certified clean-room process: earlier project investigation
-included inspecting other software. No claim of legal clean-room isolation
-or complete behavioral equivalence is made.
+The collector, UI, scripts, tests and packaging are project-specific implementations.
+The only vendored external source is the public SDK header above. Byte-layout facts
+for optional MethodInfo validation are documented in docs/NATIVE_OFFSETS.md; no
+Unity header or existing dumper source is distributed as part of that component.

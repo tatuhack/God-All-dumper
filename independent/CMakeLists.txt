@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 project(pxojdumper LANGUAGES C CXX)
-add_library(pxojdumper SHARED src/module.cpp src/collector.c)
+add_library(pxojdumper SHARED src/module.cpp src/collector.c src/native_offsets.c)
 target_include_directories(pxojdumper PRIVATE src third_party)
 target_compile_features(pxojdumper PRIVATE cxx_std_17)
 target_compile_options(pxojdumper PRIVATE -Wall -Wextra -Werror -fvisibility=hidden $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions;-fno-rtti>)

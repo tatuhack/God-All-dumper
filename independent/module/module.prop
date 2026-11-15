@@ -1,7 +1,7 @@
 id=pxojdumper
 name=pxojdumper
-version=0.1.0-independent
-versionCode=100
+version=0.2.0-independent
+versionCode=200
 author=pxojdumper contributors
-description=Independent IL2CPP metadata collector. Experimental; native method offsets unavailable.
+description=Independent IL2CPP metadata collector. Experimental runtime-validated native offsets; device testing required.
 action=action.sh

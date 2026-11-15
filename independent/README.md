@@ -1,72 +1,108 @@
 # pxojdumper
 
-新しく記述した実験的な Unity IL2CPP メタデータ収集モジュールです。対象を設定してアプリを再起動すると、取得可能な型・メソッド・フィールド情報を保存します。以前の名称変更版とは別実装・別成果物で、既存 dumper と同一機能ではありません。
+Android 向けの Unity IL2CPP ランタイム解析モジュール。対象アプリを指定し、起動時に型・メソッド・フィールド情報を JSON とテキスト一覧へ出力します。
 
-## 現在の機能
+**実験版 0.2.0。Android 実機でのインストール・ゲーム動作は未検証です。** ネイティブオフセットは対応する構造と実行可能領域を検証できた場合に限って出力し、不明な値を推測で埋めません。
 
-- 指定パッケージのメインプロセスだけを対象にします。未設定なら収集しません。
-- 標準の動的ローダーと公開 IL2CPP export を使い、最大約60秒起動待ちします。
-- アセンブリ／型／namespace（nested 型は A+Inner のように外側の型名と一緒に記録し、レコード内の type_id でも識別）、メソッド名・戻り値型・引数型、フィールド名・型・runtime が返す offset/flags を収集。
-- JSON と、読みやすいコメント形式の `.cs` 一覧を作成。元ソースやコンパイル可能な C# の復元ではありません。
-- 20万レコード上限と、レコード間で約60秒を確認する協調的な期限。IL2CPP API 内の停止や遅延を強制中断するものではありません。出力の合計64MiBもレコード間で確認し、超えたら収集を止めます（1レコード分だけ超過する場合があります）。部分出力は JSON の `partial` に記録します。
-- root shell 用の設定コマンド、Action、KernelSU 互換 bridge 用 WebUI。
+## 機能
 
-**ネイティブメソッドの関数アドレス／RVA／オフセットは未対応です。** 標準 export だけでは確定できない情報を、private な MethodInfo 配置の推測で補いません。各メソッドの `native_address` / `native_offset` は `null` です。フィールド offset は runtime API の返り値で、static/literal フィールドの場合に単純なインスタンス内オフセットとして扱わないでください。
+- アセンブリ、namespace、型名、nested 型名、メソッド名、戻り値型、引数型。
+- フィールド名・型・runtime が返すオフセットと属性フラグ。
+- 条件を満たすメソッドのネイティブアドレス、RVA、ELF 仮想アドレス、ELF ファイルオフセット。
+- パッケージ指定による収集、root shell コマンド、Action ボタン、KernelSU 互換 bridge 向け WebUI。
+- 時刻・PID付きファイルで保存。レコード上限と協調的な時間・出力容量制限。
 
-## 必要な環境と未対応事項
+出力の `.cs` はメタデータを読みやすく並べたコメント形式の一覧です。コンパイル可能な C# ソースや、元の実装を復元するものではありません。
 
-**対象アプリのプロセス内で実行します。API の非互換性や不安定な runtime により、アプリのクラッシュ・停止・起動遅延・ストレージ消費が起きる可能性があります。重要なデータのある対象でいきなり試さず、許可されたテスト環境で確認してください。プロセス内障害を隔離する仕組みはありません。**
+## 動作要件
 
-- 配布ZIPのインストーラはMagisk形式です。KernelSU/APatchへのインストール互換性は未検証で、対応を保証しません。WebUIはKernelSU互換bridge向けに実装したものですが、インストール対応を意味しません。
-- Zygisk API v5 対応環境（公式 SDK の目安は Magisk 27以降）。通常の非root Termuxだけでは動きません。
-- IL2CPP export が公開され、標準 `dlopen(..., RTLD_NOLOAD)` で参照できる対象が必要です。export 隠蔽、独自 runtime、loader namespace 制限等では失敗します。回避処理はありません。
-- Cocos2d-x/UE4/UE5、Mono、コードやassets復元、定数値復元、属性/property/継承の完全復元、x86環境でのARM変換ロードは未対応です。
-- 対象プロセスを止めないため、一貫したスナップショットではありません。アプリ起動後に追加された型をすべて拾う保証はありません。
-- **Android 実機のインストール・WebUI・ゲーム起動・実際の出力は未検証です。** 同一動作／すべてのゲームへの互換性は保証しません。自作または解析許可のある対象で検証してください。
+- Android API 23 以降。ビルド対象: arm64-v8a、armeabi-v7a、x86、x86_64。
+- Zygisk API v5 に対応する root 環境。公式 SDK の基準は Magisk 27 以降です。
+- 公開 IL2CPP export があり、標準ローダーからアクセス可能な Unity IL2CPP アプリ。
+- ネイティブオフセットの収集には、対象プロセス自身の `/proc/self/mem` と `/proc/self/maps` の読み取りが必要です。拒否された場合は回避せず、そのメソッドのオフセットを取得不可として記録します。
+
+ZIP は Magisk 形式です。KernelSU/APatch のインストール互換性は未検証で、対応を保証しません。WebUI の bridge 対応は、インストーラやランタイムの互換性保証ではありません。通常の非 root Termux 単体では利用できません。
 
 ## ビルド
 
-公式 Android NDK r28c と CMake 4.1.2 を用意し、Python 3 で実行します。
+Python 3、公式 Android NDK r28c、CMake 4.1.2 を用意します。
 
 ```sh
-python3 tools/build.py --ndk /path/to/android-ndk-r28c --cmake-bin /path/to/cmake/bin
+python3 tools/build.py \
+  --ndk /path/to/android-ndk-r28c \
+  --cmake-bin /path/to/cmake/bin
 ```
 
-Android API23向けの4ABIを生成し、`out/pxojdumper-0.1.0-independent.zip` にまとめます。C++ STL は使わず、公式 SDK が必要とする Android system libstdc++ のみに依存します。ビルドは端末設定やインストールを変更しません。
+4 ABI のネイティブライブラリと、次のインストール用 ZIP を生成します。
 
-## 使い方
+```text
+out/pxojdumper-0.2.0-independent.zip
+```
 
-1. この版と以前の版は同じモジュールIDを使うため、どちらを入れるか確認してください。インストールすると同IDの既存版を更新する可能性があります。自動インストールはしません。
-2. 対応root managerでモジュールZIPをインストールし、必要な再起動を行います。
-3. root shellで対象を指定します（Termuxでは自分でroot shellを開く必要があります）。
+ビルドは端末へのインストール、再起動、アップロード、セキュリティ設定変更を行いません。C++ STL は使用せず、公式 SDK が必要とする Android system libstdc++ にリンクします。
+
+## インストールと設定
+
+1. ソース ZIP ではなく、ビルドしたモジュール ZIP を root manager へ渡します。
+2. 必要な再起動後、root shell で対象を設定します。
+3. 対象アプリを再起動します。
 
 ```sh
 /data/adb/modules/pxojdumper/pxojdumper set com.example.game
 /data/adb/modules/pxojdumper/pxojdumper show
 ```
 
-対象アプリを再起動すると、アプリの専用ディレクトリに時刻・PID付きで保存します。
+対象を設定しない限り収集しません。Termux を使う場合も、利用者自身が許可された root shell を用意する必要があります。
+
+収集を停止するには:
+
+```sh
+/data/adb/modules/pxojdumper/pxojdumper off
+```
+
+`off` は次回起動からの収集を無効にします。進行中の収集を強制終了するものではありません。モジュール ID は `pxojdumper` なので、同じ ID の既存インストールがある場合は更新・置換される可能性があります。
+
+## 出力
 
 ```text
 /data/data/<package>/files/pxojdumper/dump-<timestamp>-<pid>.json
 /data/data/<package>/files/pxojdumper/dump-<timestamp>-<pid>.cs
 ```
 
-既存の成功出力を上書きしません。失敗理由は `pxojdumper` タグの Android logcat に出します。共有Downloadへの自動コピーは行いません。WebUIの停止、または次のコマンドは次回起動以降の収集を止めます。進行中の収集を強制終了しません。
+- `native_address`: ARM32 Thumb ビットを分離した実行時アドレス。
+- `raw_method_pointer`: runtime の MethodInfo から読んだ元のポインター。
+- `native_offset`: 所属 ELF の最小 PT_LOAD 仮想アドレスを基準とした RVA。
+- `image_base`: その最小 PT_LOAD の実行時アドレス。
+- `elf_load_bias`: ローダーが報告する ELF のロードバイアス。
+- `elf_virtual_address`: `native_address - elf_load_bias`。
+- `elf_file_offset`: 対応する ELF 内のファイル位置。非ファイル領域は `null`。
+- `offset_status` / `offset_confidence`: 検証状態と条件付きであることの明示。
 
-```sh
-/data/adb/modules/pxojdumper/pxojdumper off
-```
+アドレス類は精度損失を避けるため16進文字列で保存します。アドレス、RVA、ELF 仮想アドレス、ファイルオフセットは別の値です。ASLRにより実行時アドレスは変わります。詳細は [ネイティブオフセット仕様](docs/NATIVE_OFFSETS.md)。
 
-## 検証
+## 対応範囲と制限
+
+ネイティブ抽出は、Unity 2020.3 系・2022.3 系で確認できる2種類の MethodInfo レイアウトに対応する構造を対象とします。**Unity バージョンを自動判定した結果ではありません。** 名前・宣言クラス・戻り値型のポインター、token、引数数、flags、iflagsを公開APIの返り値と照合します。さらに初期メモリマップと ELF 実行可能セグメントの対応を確認します。
+
+成功時の `layout_and_mapping_snapshot_validated` は、この構造照合と初期マッピング照合が通ったという意味です。`conditional_on_runtime_layout` のとおり、任意の改変runtimeで正しい関数本体であることまで証明しません。共有generic実装やthunkが返る場合があり、複数メソッドが同じアドレスを持つこともあります。マッピングは開始時のスナップショットで、後の再配置・権限変更を完全には追跡しません。
+
+未対応・失敗時は `native_address` / `native_offset` を `null` にし、理由を記録します。例: 不一致レイアウト、補助export不足、読み取り拒否、NULLポインター、実行不能領域、所属ELF不明。
+
+Cocos2d-x、UE4/UE5、Mono、ARM変換環境のブリッジロード、assets復元、暗号解除、保護回避、完全なSDK/ソース復元には対応しません。フィールドのstatic/literal属性によっては、APIの返すoffsetをインスタンス内位置として使えません。
+
+**処理は対象アプリ内で実行されます。** 非互換APIや不安定なruntimeでは、クラッシュ・停止・起動遅延が起きる可能性があります。許可されたテスト環境で使用してください。
+
+収集は20万レコード、レコード間で約60秒、JSONとテキスト合計64MiBを確認します。時間・容量は協調的な制限で、API内の停止を中断せず、1レコード分の容量超過がありえます。部分収集は `partial`、起動・保存エラーは Android logcat の `pxojdumper` タグで確認できます。共有Downloadへ自動コピーしません。
+
+## テスト
 
 ```sh
 python3 -m unittest discover -s tests -v
 node tests/webui_test.mjs
 ```
 
-テストの runtime は独自の模擬ライブラリです。実際の Unity の互換性検証ではありません。詳細は TEST_RESULTS.md。
+ホストテストは模擬IL2CPP runtimeと実際にロードしたテスト用ELFを使用します。実際のUnityゲームや端末の互換性を保証するものではありません。ビルド・検証状況は [TEST_RESULTS.md](TEST_RESULTS.md) に記載しています。
 
-## 出典とライセンス
+## ライセンス
 
-収集処理・UI・設定・テストは本版向けに新規記述しています。外部コードは公式Zygisk SDKヘッダーのみで、元の著作権表示と0BSD許諾を保持しています。詳細は THIRD_PARTY_NOTICES.md。過去の調査では他ツールを閲覧しているため、法的なクリーンルーム開発を保証するものではありません。
+[0BSD](LICENSE)。公式 Zygisk SDK ヘッダーの原文・著作権・許諾を保持しています。外部コードと技術参照は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。

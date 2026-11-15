@@ -20,6 +20,8 @@ def archive(build, destination):
         members[f'zygisk/{abi}.so']=binary
     for path in (ROOT/'module').rglob('*'):
         if path.is_file():members[path.relative_to(ROOT/'module').as_posix()]=path.read_bytes()
+    for path in (ROOT/'docs').rglob('*'):
+        if path.is_file():members[path.relative_to(ROOT).as_posix()]=path.read_bytes()
     for name in ('LICENSE','THIRD_PARTY_NOTICES.md','README.md','TEST_RESULTS.md'):
         members[name]=(ROOT/name).read_bytes()
     destination.parent.mkdir(parents=True,exist_ok=True)
@@ -36,7 +38,7 @@ def main():
     p.add_argument('--ndk',type=Path,default=os.environ.get('ANDROID_NDK_HOME'))
     p.add_argument('--cmake-bin',type=Path,default=os.environ.get('CMAKE_BIN'))
     p.add_argument('--build',type=Path,default=ROOT/'build')
-    p.add_argument('--output',type=Path,default=ROOT/'out/pxojdumper-0.1.0-independent.zip')
+    p.add_argument('--output',type=Path,default=ROOT/'out/pxojdumper-0.2.0-independent.zip')
     p.add_argument('--package-only',action='store_true')
     a=p.parse_args();a.build=a.build.resolve()
     if not a.package_only:

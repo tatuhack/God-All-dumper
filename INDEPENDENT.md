@@ -1,6 +1,6 @@
-# pxojdumper independent implementation
+# pxojdumper
 
-The new implementation is in [independent/](independent/README.md).
-Existing root files are retained as the earlier version; main is unchanged.
-Build and test the independent directory, not the earlier root Gradle project.
-Native method offsets are not implemented. Android device behavior is unverified.
+Current implementation: [independent/](independent/README.md).
+Build and test that directory. The earlier root Gradle project is retained separately.
+Native offsets use conditional runtime-layout and executable-mapping validation.
+Android device behavior is unverified.

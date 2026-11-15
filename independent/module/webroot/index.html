@@ -6,5 +6,5 @@
 <p>許可された Unity IL2CPP アプリを指定してください。対象を変更したら、そのアプリを再起動します。</p>
 <label for="package">対象パッケージ</label><input id="package" autocomplete="off" placeholder="com.example.game" maxlength="90">
 <button id="save">保存</button><button id="off">停止</button><p id="status" role="status" aria-live="polite">読み込み中…</p>
-<small>実験版・実機未検証。ネイティブメソッドのアドレス／オフセットは未対応です。保存先は対象アプリの files/pxojdumper/ です。</small>
+<small>実験版・実機未検証。対応レイアウトと実行可能領域を検証できたメソッドのみ、条件付きでネイティブオフセットを出力します。保存先は対象アプリの files/pxojdumper/ です。</small>
 </main><script type="module" src="app.mjs"></script></body></html>

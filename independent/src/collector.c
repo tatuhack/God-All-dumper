@@ -1,4 +1,6 @@
 #include "collector.h"
+#include "native_offsets.h"
+#include <inttypes.h>
 #include <dlfcn.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -12,7 +14,7 @@
 #define PXO_OUTPUT_LIMIT (64L*1024L*1024L)
 #endif
 
-/* Opaque API types: no private Unity layout is read. */
+/* Metadata APIs remain opaque. Native extraction is isolated and validated. */
 typedef void Object;
 struct Api {
     Object *(*domain_get)(void);
@@ -29,6 +31,9 @@ struct Api {
     const Object *(*class_get_methods)(Object *, void **);
     Object *(*class_get_fields)(Object *, void **);
     const char *(*method_get_name)(const Object *);
+    Object *(*method_get_class)(const Object *);
+    uint32_t (*method_get_token)(const Object *);
+    uint32_t (*method_get_flags)(const Object *,uint32_t *);
     uint32_t (*method_get_param_count)(const Object *);
     const Object *(*method_get_return_type)(const Object *);
     const Object *(*method_get_param)(const Object *, uint32_t);
@@ -61,6 +66,15 @@ static void quoted(FILE *out, const char *value) {
         else fputc(c,out);
     }
     fputc('"',out);
+}
+static void native_json(FILE *out,const struct PxoNative *n) {
+    fputs(",\"offset_status\":",out);quoted(out,n->status);
+    fputs(",\"offset_profile\":",out);quoted(out,n->profile);
+    fputs(",\"offset_confidence\":",out);quoted(out,n->available?"conditional_on_runtime_layout":"unavailable");
+    if(!n->available){fputs(",\"native_address\":null,\"native_offset\":null",out);return;}
+    fprintf(out,",\"raw_method_pointer\":\"0x%" PRIxPTR "\",\"native_address\":\"0x%" PRIxPTR "\",\"native_offset\":\"0x%" PRIxPTR "\",\"elf_load_bias\":\"0x%" PRIxPTR "\",\"image_base\":\"0x%" PRIxPTR "\",\"elf_virtual_address\":\"0x%" PRIxPTR "\",\"thumb\":%s,\"native_module\":",n->raw,n->address,n->rva,n->load_bias,n->image_base,n->elf_vaddr,n->thumb?"true":"false");
+    quoted(out,n->module);
+    if(n->file_backed)fprintf(out,",\"elf_file_offset\":\"0x%" PRIxPTR "\"",n->file_offset);else fputs(",\"elf_file_offset\":null",out);
 }
 static void typename_json(FILE *out, struct Api *a, const Object *type) {
     char *name=type ? a->type_get_name(type) : NULL;
@@ -97,6 +111,9 @@ int pxo_collect(void *library,const char *directory,size_t max_records,char *err
     LOAD(method_get_name); LOAD(method_get_param_count); LOAD(method_get_return_type); LOAD(method_get_param);
     LOAD(field_get_name); LOAD(field_get_offset); LOAD(field_get_type); LOAD(field_get_flags);
     LOAD(type_get_name); LOAD(free);
+    *(void **)(&a.method_get_class)=dlsym(library,"il2cpp_method_get_class");
+    *(void **)(&a.method_get_token)=dlsym(library,"il2cpp_method_get_token");
+    *(void **)(&a.method_get_flags)=dlsym(library,"il2cpp_method_get_flags");
     Object *domain=a.domain_get();
     if(!domain) {snprintf(error,error_size,"IL2CPP domain is not ready");return 3;}
     Object *thread=a.thread_attach(domain);
@@ -118,8 +135,10 @@ int pxo_collect(void *library,const char *directory,size_t max_records,char *err
         if(json){fclose(json);unlink(json_path);} if(text){fclose(text);unlink(text_path);}
         a.thread_detach(thread);snprintf(error,error_size,"Cannot create output files");return 1;
     }
-    fprintf(json,"{\"tool\":\"pxojdumper\",\"schema\":1,\"native_method_offsets_available\":false,\"records\":[\n");
-    fprintf(text,"// pxojdumper metadata listing, not compilable C# source.\n// Native method addresses/offsets unavailable; no private layout assumptions.\n");
+    fprintf(json,"{\"tool\":\"pxojdumper\",\"schema\":2,\"native_offset_mode\":\"runtime_layout_validation\",\"records\":[\n");
+    fprintf(text,"// pxojdumper metadata listing, not compilable C# source.\n// Native offsets require matching runtime layouts and executable ELF checks; not semantic proof.\n");
+    struct PxoNativeContext *native=pxo_native_open();
+    size_t native_ok=0,native_missing=0;
     size_t records=0;bool partial=false;struct timespec start;clock_gettime(CLOCK_MONOTONIC,&start);
 #define BUDGET() if(records>=max_records||expired(&start)||ferror(json)||ferror(text)||ftell(json)+ftell(text)>PXO_OUTPUT_LIMIT){partial=true;goto done;}
 #define ROW() do{if(records)fputs(",\n",json);records++;}while(0)
@@ -146,8 +165,18 @@ int pxo_collect(void *library,const char *directory,size_t max_records,char *err
                 fprintf(json,",\"parameter_count\":%u,\"parameter_types\":[",count);
                 uint32_t cap=count>1024 ? 1024:count;if(cap!=count)partial=true;
                 for(uint32_t p=0;p<cap;p++){if(p)fputc(',',json);typename_json(json,&a,a.method_get_param(method,p));}
-                fputs("],\"native_address\":null,\"native_offset\":null}",json);
-                fputs("// Method ",text);quoted(text,a.method_get_name(method));fprintf(text," (%u parameters); native offset: unavailable\n",count);
+                struct PxoNative offset;struct PxoEvidence evidence={0};const struct PxoEvidence *validation=NULL;
+                if(a.method_get_class&&a.method_get_token&&a.method_get_flags){
+                    evidence.name=(uintptr_t)a.method_get_name(method);evidence.klass=(uintptr_t)a.method_get_class(method);
+                    evidence.return_type=(uintptr_t)a.method_get_return_type(method);evidence.parameter_count=count;
+                    evidence.token=a.method_get_token(method);evidence.flags=a.method_get_flags(method,&evidence.iflags);
+                    validation=&evidence;
+                }
+                pxo_native_resolve(native,method,validation,&offset);
+                fputc(']',json);native_json(json,&offset);fputc('}',json);
+                fputs("// Method ",text);quoted(text,a.method_get_name(method));
+                if(offset.available){native_ok++;fprintf(text," (%u parameters); RVA: 0x%" PRIxPTR "; VA: 0x%" PRIxPTR "; conditional layout: %s\n",count,offset.rva,offset.address,offset.profile);}
+                else {native_missing++;fprintf(text," (%u parameters); native offset unavailable: %s\n",count,offset.status);}
             }
             iterator=NULL;Object *field;
             while((field=a.class_get_fields(klass,&iterator))) {
@@ -163,7 +192,8 @@ int pxo_collect(void *library,const char *directory,size_t max_records,char *err
         }
     }
 done:
-    fprintf(json,"\n],\"record_count\":%zu,\"partial\":%s}\n",records,partial?"true":"false");
+    fprintf(json,"\n],\"record_count\":%zu,\"partial\":%s,\"native_offsets_validated\":%zu,\"native_offsets_unavailable\":%zu}\n",records,partial?"true":"false",native_ok,native_missing);
+    pxo_native_close(native);
     fprintf(text,"// Records: %zu; partial: %s\n",records,partial?"true":"false");
     bool io_error=ferror(json)||ferror(text);if(fclose(json)!=0)io_error=true;if(fclose(text)!=0)io_error=true;
     a.thread_detach(thread);
