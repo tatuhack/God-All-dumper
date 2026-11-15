@@ -32,7 +32,7 @@ checksums advertised by Google's repository XML:
   SHA-1 c8c4f1c19b75c56f28b9dcf1af928d25cf1a1471
 
 Build command used tools/build_native.sh with Android API 23 and c++_static.
-Native source implementation was unchanged. Build logs are included under verification/.
+Native source implementation was unchanged. Build logs were retained locally and are excluded from this source repository.
 
 ## Not completed / limitations
 
