@@ -1,0 +1,35 @@
+{
+  "tool": "pxojdumper",
+  "schema": 2,
+  "partial": false,
+  "records": [
+    {
+      "kind": "type",
+      "type_id": 0,
+      "name": "Example"
+    },
+    {
+      "kind": "method",
+      "name": "Add",
+      "declaring_type": "Example",
+      "namespace": "Test",
+      "image": "Assembly-CSharp.dll",
+      "parameter_count": 1,
+      "parameter_types": [
+        "System.Int32"
+      ],
+      "return_type": "System.Int32",
+      "offset_status": "layout_and_mapping_snapshot_validated",
+      "offset_confidence": "conditional_on_runtime_layout",
+      "native_address": "0x7f002000",
+      "image_base": "0x7f000000",
+      "elf_load_bias": "0x7f000000",
+      "native_offset": "0x2000",
+      "elf_virtual_address": "0x2000",
+      "raw_method_pointer": "0x7f002000",
+      "thumb": false,
+      "native_module": "/data/app/test/lib/arm64/libil2cpp.so"
+    }
+  ],
+  "example_only": true
+}
