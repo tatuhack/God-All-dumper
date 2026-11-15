@@ -1,0 +1,12 @@
+#!/system/bin/sh
+# Configuration only. Does not launch apps, change protections, or install anything.
+case "${1:-show}" in
+  show) getprop persist.pxojdumper.package ;;
+  off) setprop persist.pxojdumper.package '' ;;
+  set)
+    [ "$#" -eq 2 ] || { echo 'Usage: pxojdumper set com.example.game' >&2; exit 2; }
+    [ "${#2}" -le 90 ] || { echo 'Package name is too long' >&2; exit 2; }
+    printf '%s\n' "$2" | grep -Eq '^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z][A-Za-z0-9_]*)+$' || { echo 'Invalid package name' >&2; exit 2; }
+    setprop persist.pxojdumper.package "$2" ;;
+  *) echo 'Usage: pxojdumper show | set PACKAGE | off' >&2; exit 2 ;;
+esac

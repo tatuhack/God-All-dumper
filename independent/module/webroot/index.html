@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>pxojdumper</title>
+<style>
+:root{color-scheme:light dark;font:16px system-ui}body{margin:0;padding:24px;background:#151a24;color:#eef3ff}main{max-width:520px;margin:6vh auto;padding:24px;border:1px solid #3b4964;border-radius:16px}h1{margin:0 0 8px}p{line-height:1.6}label{display:block;margin:20px 0 6px}input,button{font:inherit;padding:12px;border-radius:8px;border:1px solid #647697}input{width:100%;box-sizing:border-box}button{margin:16px 8px 0 0;background:#c4d4ff;color:#182035}button:disabled{opacity:.5}#status{min-height:3em;overflow-wrap:anywhere}small{color:#b9c6df}
+</style></head><body><main><h1>pxojdumper</h1><small>Independent runtime metadata collector</small>
+<p>許可された Unity IL2CPP アプリを指定してください。対象を変更したら、そのアプリを再起動します。</p>
+<label for="package">対象パッケージ</label><input id="package" autocomplete="off" placeholder="com.example.game" maxlength="90">
+<button id="save">保存</button><button id="off">停止</button><p id="status" role="status" aria-live="polite">読み込み中…</p>
+<small>実験版・実機未検証。ネイティブメソッドのアドレス／オフセットは未対応です。保存先は対象アプリの files/pxojdumper/ です。</small>
+</main><script type="module" src="app.mjs"></script></body></html>

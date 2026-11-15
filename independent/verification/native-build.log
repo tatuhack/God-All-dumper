@@ -1,0 +1,21 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/pxo-independent/arm64-v8a
+[1/2] Building C object CMakeFiles/pxojdumper.dir/src/collector.c.o
+[2/2] Linking CXX shared library libpxojdumper.so
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/pxo-independent/armeabi-v7a
+[1/2] Building C object CMakeFiles/pxojdumper.dir/src/collector.c.o
+[2/2] Linking CXX shared library libpxojdumper.so
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/pxo-independent/x86
+[1/2] Building C object CMakeFiles/pxojdumper.dir/src/collector.c.o
+[2/2] Linking CXX shared library libpxojdumper.so
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/pxo-independent/x86_64
+[1/2] Building C object CMakeFiles/pxojdumper.dir/src/collector.c.o
+[2/2] Linking CXX shared library libpxojdumper.so
+/workspace/scratch/bb5d8740f88a/pxojdumper-independent/out/pxojdumper-0.1.0-independent.zip

@@ -1,0 +1,18 @@
+test_bad_output_path (test_collector.CollectorTests.test_bad_output_path) ... ok
+test_metadata_and_mock_api_field_offset (test_collector.CollectorTests.test_metadata_and_mock_api_field_offset) ... ok
+test_missing_exports (test_collector.CollectorTests.test_missing_exports) ... ok
+test_nested_class_names_are_not_ambiguous (test_collector.CollectorTests.test_nested_class_names_are_not_ambiguous) ... ok
+test_not_ready_produces_no_files (test_collector.CollectorTests.test_not_ready_produces_no_files) ... ok
+test_output_limit_stops_nonterminating_iterator (test_collector.CollectorTests.test_output_limit_stops_nonterminating_iterator) ... ok
+test_record_limit (test_collector.CollectorTests.test_record_limit) ... ok
+test_zero_budget (test_collector.CollectorTests.test_zero_budget) ... ok
+test_distribution_brand_and_limits (test_distribution.DistributionTests.test_distribution_brand_and_limits) ... ok
+test_module_archive_layout (test_distribution.DistributionTests.test_module_archive_layout) ... ok
+test_sdk_integrity (test_distribution.DistributionTests.test_sdk_integrity) ... ok
+test_shell_syntax (test_distribution.DistributionTests.test_shell_syntax) ... ok
+test_shell_validation_with_mock_properties (test_distribution.DistributionTests.test_shell_validation_with_mock_properties) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.171s
+
+OK

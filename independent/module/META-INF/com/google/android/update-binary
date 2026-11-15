@@ -1,0 +1,11 @@
+#!/sbin/sh
+# Root-manager installer interface. Executed only by the owner's installer.
+OUTFD=$2
+ZIPFILE=$3
+export OUTFD ZIPFILE
+if [ ! -r /data/adb/magisk/util_functions.sh ]; then
+  echo 'Install pxojdumper through a compatible root manager.' >&2
+  exit 1
+fi
+. /data/adb/magisk/util_functions.sh
+install_module

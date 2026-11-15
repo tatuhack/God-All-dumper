@@ -1,0 +1,1 @@
+UI tests passed: validation, load/save/off, missing bridge, save failure, bridge callback cleanup.
