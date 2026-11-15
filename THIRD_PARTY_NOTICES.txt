@@ -1,0 +1,20 @@
+pxojdumper third-party attribution
+
+Main project: MIT, Copyright (c) 2020 Rikka. Full text: LICENSE.
+Runtime dumping code retains Perfare's original author notices.
+Fork contributions: codehasan. Source fork: tatuhack.
+
+xDL: Copyright (c) 2020-2021 HexHacking Team, MIT.
+Original notices and permission text are preserved in every bundled xDL source.
+Project: https://github.com/hexhacking/xDL
+The MIT permission/warranty text in LICENSE also applies to the xDL copyright
+notice above; it does not replace or remove any original source notice.
+
+KernelSU WebUI helper: KOWX712/kernelsu-alt, based on the kernelsu npm helper.
+The helper source's original attribution header is preserved verbatim.
+Its upstream package.json declares Apache-2.0:
+https://github.com/KOWX712/kernelsu-alt/blob/master/package.json
+Full license: licenses/Apache-2.0.txt.
+
+Gradle wrapper: Gradle project, Apache-2.0. Original wrapper files preserved.
+The wrapper is a source build dependency, not part of the installed module.

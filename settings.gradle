@@ -1,0 +1,10 @@
+rootProject.name = 'pxojdumper'
+
+include ':module'
+
+import org.apache.tools.ant.DirectoryScanner
+
+DirectoryScanner.removeDefaultExclude('**/.gitattributes')
+
+// Enable type-safe project accessors
+enableFeaturePreview('TYPESAFE_PROJECT_ACCESSORS')

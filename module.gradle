@@ -1,0 +1,9 @@
+ext {
+    moduleLibraryName = "pxojdumper"
+    moduleId = "pxojdumper"
+    moduleName = "pxojdumper"
+    moduleAuthor = "codehasan & Perfare"
+    moduleDescription = "Dumps IL2CPP metadata from a Unity game at runtime."
+    moduleVersion = "v1.6.1"
+    moduleVersionCode = 6
+}

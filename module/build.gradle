@@ -1,0 +1,118 @@
+import com.android.build.api.artifact.SingleArtifact
+import org.apache.tools.ant.filters.FixCrLfFilter
+
+apply plugin: 'com.android.library'
+apply from: file(rootProject.file('module.gradle'))
+
+android {
+    namespace = "io.pxojdumper"
+    compileSdk = rootProject.ext.targetSdk
+    ndkVersion = '28.2.13676358'
+
+    defaultConfig {
+        minSdk = rootProject.ext.minSdk
+        targetSdk = rootProject.ext.targetSdk
+
+        externalNativeBuild {
+            cmake {
+                arguments("-DMODULE_NAME:STRING=$moduleLibraryName")
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "4.1.2"
+        }
+    }
+}
+
+androidComponents {
+    def adbProvider = sdkComponents.adb
+
+    onVariants(selector().all()) { variant ->
+        def variantCapped = variant.name.capitalize()
+        def variantLowered = variant.name.toLowerCase()
+
+        def zipName = "${moduleName.replace(' ', '_')}-${moduleVersion}-${moduleVersionCode}-${variantLowered}.zip"
+        def moduleDir = file("$outDir/module_$variantLowered")
+        def aarArtifact = variant.artifacts.get(SingleArtifact.AAR.INSTANCE)
+
+        tasks.register("prepareModuleFiles${variantCapped}", Sync) {
+            dependsOn("assemble$variantCapped")
+
+            def templatePath = "$rootDir/template/module"
+
+            into moduleDir
+            from(rootProject.file("LICENSE"))
+            from(rootProject.file("NOTICE.md"))
+            from(rootProject.file("THIRD_PARTY_NOTICES.txt"))
+            from(rootProject.file("licenses")) { into "licenses" }
+            from(templatePath) {
+                exclude 'module.prop'
+            }
+
+            from(templatePath) {
+                include 'module.prop'
+                expand([
+                        id         : moduleId,
+                        name       : moduleName,
+                        version    : moduleVersion,
+                        versionCode: moduleVersionCode.toString(),
+                        author     : moduleAuthor,
+                        description: moduleDescription,
+                ])
+                filter(FixCrLfFilter.class,
+                        eol: FixCrLfFilter.CrLf.newInstance("lf"))
+            }
+
+            // AAR packs native libs at jni/<abi>/lib*.so; Zygisk expects them
+            // at zygisk/<abi>.so, so map each entry straight to its final path.
+            from(aarArtifact.map { zipTree(it) }) {
+                include 'jni/*/*.so'
+                includeEmptyDirs = false
+                eachFile { it.path = "zygisk/${it.relativePath.segments[1]}.so" }
+            }
+
+            def moduleShTree = fileTree(moduleDir).matching { include '**/*.sh' }
+
+            doLast {
+                // Set executable permissions for shell scripts
+                moduleShTree.each {
+                    it.setExecutable(true, false)
+                }
+            }
+        }
+
+        tasks.register("zip${variantCapped}", Zip) {
+            dependsOn("prepareModuleFiles${variantCapped}")
+            from moduleDir
+            archiveFileName.set(zipName)
+            destinationDirectory.set(outDir)
+        }
+
+        tasks.register("push${variantCapped}", Exec) {
+            dependsOn("zip${variantCapped}")
+            workingDir outDir
+            commandLine adbProvider.get().asFile, "push", zipName, "/data/local/tmp/"
+        }
+
+        tasks.register("flash${variantCapped}", Exec) {
+            dependsOn("push${variantCapped}")
+            commandLine adbProvider.get().asFile, "shell", "su", "-c",
+                    "magisk --install-module /data/local/tmp/${zipName}"
+        }
+
+        tasks.register("flashAndReboot${variantCapped}", Exec) {
+            dependsOn("flash${variantCapped}")
+            commandLine adbProvider.get().asFile, "shell", "reboot"
+        }
+
+        afterEvaluate {
+            tasks.named("assemble${variantCapped}").configure {
+                finalizedBy("zip${variantCapped}")
+            }
+        }
+    }
+}
