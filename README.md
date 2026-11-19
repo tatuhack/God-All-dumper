@@ -2,7 +2,7 @@
 
 Android 向けの Unity IL2CPP ランタイム解析モジュール。対象アプリを指定し、型・メソッド・フィールド情報と、検証条件を満たすネイティブオフセットを出力します。
 
-> このブランチの現行実装は **[independent/](independent/README.md)** にあります。リポジトリルートの既存ソースは別の以前の実装です。以下の機能・ビルド手順は independent/ の新規実装についての説明です。
+> このREADMEは [pxojdumper v0.2.0](https://github.com/tatuhack/God-All-dumper/tree/pxojdumper-independent/independent) の機能と手順を説明しています。`main` には旧実装を保持しています。
 
 ## 機能
 
@@ -78,6 +78,6 @@ Cocos2d-x、UE4/UE5、Mono、assets復元、暗号解除、保護回避、完全
 
 ## ライセンス
 
-現行の新規実装は [0BSD](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper-independent/independent/LICENSE)。公式Zygisk SDKヘッダーの著作権・許諾は保持しています。[外部コードと技術参照](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper-independent/independent/THIRD_PARTY_NOTICES.md)を参照してください。
+v0.2.0 のソースは [0BSD](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper-independent/independent/LICENSE)。公式Zygisk SDKヘッダーの著作権・許諾は保持しています。[外部コードと技術参照](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper-independent/independent/THIRD_PARTY_NOTICES.md)を参照してください。
 
-`main` に保持している以前のソースには、その [LICENSE](LICENSE)、[NOTICE.md](NOTICE.md)、[THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) が適用されます。新規実装のライセンスが既存ソースの権利表示を置き換えることはありません。
+`main` に保持している以前のソースには、その [LICENSE](LICENSE)、[NOTICE.md](NOTICE.md)、[THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) が適用されます。v0.2.0 のライセンスは旧実装には適用されません。
