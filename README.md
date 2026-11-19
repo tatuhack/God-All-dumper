@@ -16,7 +16,7 @@ Android 向けの Unity IL2CPP ランタイム解析モジュール。対象ア�
 
 Android API23以降、arm64-v8a / armeabi-v7a / x86 / x86_64 をビルド対象にしています。Zygisk API v5対応のroot環境（公式SDKの基準はMagisk27以降）と、公開IL2CPP exportへ標準ローダーからアクセスできるUnity IL2CPPアプリが必要です。
 
-インストーラはMagisk形式です。KernelSU/APatchへのインストール互換性は未検証です。通常の非root Termux単体では動作しません。
+インストーラは Magisk 形式です。通常の非 root Termux 単体では動作しません。
 
 ## ビルド
 
@@ -68,7 +68,7 @@ python3 tools/build.py \
 
 ## 制限と検証状況
 
-**実験版・実機未検証です。** 4 ABIのネイティブビルドとホストテストは通過していますが、端末へのインストール、実際のUnityゲーム、root-manager WebViewの動作は未検証です。
+4 ABI のネイティブビルドとホストテストは通過しています。すべての環境で動作するかは保証できません。
 
 対象プロセス内で実行するため、非互換APIや不安定なruntimeではクラッシュ・停止・起動遅延が起きる可能性があります。許可されたテスト環境で使用してください。取得時のマップ変更を完全には追跡しません。
 
