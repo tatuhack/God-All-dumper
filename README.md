@@ -2,7 +2,7 @@
 
 Android 向けの Unity IL2CPP ランタイム解析モジュール。対象アプリを指定し、型・メソッド・フィールド情報と、検証条件を満たすネイティブオフセットを出力します。
 
-> 現行の新規実装は **[pxojdumper-independent ブランチの independent/](https://github.com/tatuhack/God-All-dumper/tree/pxojdumper-independent/independent)** にあります。`main` のコードは以前の実装を保持しています。以下の機能・ビルド手順は現行の新規実装についての説明です。
+> v0.2.0 のソースは **[pxojdumper-independent ブランチの independent/](https://github.com/tatuhack/God-All-dumper/tree/pxojdumper-independent/independent)** にあります。`main` は旧実装を保持しています。以下の手順は v0.2.0 が対象です。
 
 ## 機能
 
@@ -68,7 +68,7 @@ python3 tools/build.py \
 
 ## 制限と検証状況
 
-**実験版・実機未検証です。** 4 ABIのネイティブビルドとホストテストは通過していますが、端末へのインストール、実際のUnityゲーム、root-manager WebViewの動作は未検証です。
+4 ABI のネイティブビルドとホストテストは通過しています。Android 実機へのインストール、Unity ゲーム上での動作、root 管理アプリの WebView は未確認です。
 
 対象プロセス内で実行するため、非互換APIや不安定なruntimeではクラッシュ・停止・起動遅延が起きる可能性があります。許可されたテスト環境で使用してください。取得時のマップ変更を完全には追跡しません。
 
