@@ -271,7 +271,7 @@ def print_details(item):
 
 def parser():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--version', action='version', version=f'PXOJ Seeker {VERSION} (Offline)')
+    p.add_argument('--version', action='version', version=f'PXOJ Seeker {VERSION}')
     sub = p.add_subparsers(dest='command', required=True)
     info = sub.add_parser('info', help='Summarize schema, kinds and native availability')
     info.add_argument('dump', type=Path)
