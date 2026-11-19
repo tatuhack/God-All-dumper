@@ -1,6 +1,6 @@
 # PXOJ Diff
 
-pxojdumper independent の schema 2 JSON を2つ読み、同じメタデータの関数候補、RVAの変化、旧版だけ・新版だけに現れる関数、曖昧な一致を整理するオフラインCLIです。
+pxojdumper の Schema 2 JSON を比較する CLI です。関数の対応候補、RVA の変化、片方のダンプにしかない関数、曖昧な一致を表示します。
 
 バージョン: 0.1.0。Python 標準ライブラリで動作する CLI です。ZIP を展開して使用します。すべての環境で動作するかは保証できません。Magisk モジュールではありません。
 
