@@ -2,7 +2,7 @@
 
 Android 向けの Unity IL2CPP ランタイム解析モジュール。対象アプリを指定し、型・メソッド・フィールド情報と、検証条件を満たすネイティブオフセットを出力します。
 
-> このREADMEは [pxojdumper v0.2.0](https://github.com/tatuhack/God-All-dumper/tree/pxojdumper-independent/independent) の機能と手順を説明しています。`main` には旧実装を保持しています。
+> このREADMEは [pxojdumper v0.2.0](https://github.com/tatuhack/God-All-dumper/tree/pxojdumper/independent) の機能と手順を説明しています。`main` には旧実装を保持しています。
 
 ## 機能
 
@@ -25,7 +25,7 @@ Android API23以降、arm64-v8a / armeabi-v7a / x86 / x86_64 をビルド対象�
 ```sh
 git clone https://github.com/tatuhack/God-All-dumper.git
 cd God-All-dumper
-git switch pxojdumper-independent
+git switch pxojdumper
 cd independent
 python3 tools/build.py \
   --ndk /path/to/android-ndk-r28c \
@@ -64,7 +64,7 @@ python3 tools/build.py \
 
 成功時も `conditional_on_runtime_layout` と記録します。任意の改変runtimeでの意味的な正しさや元の関数本体であることを証明するものではなく、generic共有実装やthunkが返る場合があります。条件を満たさない値は `null` と理由を記録します。
 
-詳細: [ネイティブオフセット仕様](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper-independent/independent/docs/NATIVE_OFFSETS.md)
+詳細: [ネイティブオフセット仕様](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper/independent/docs/NATIVE_OFFSETS.md)
 
 ## 制限と検証状況
 
@@ -74,10 +74,10 @@ python3 tools/build.py \
 
 Cocos2d-x、UE4/UE5、Mono、assets復元、暗号解除、保護回避、完全なSDK/ソース復元には対応しません。`.cs` はコンパイル可能な元ソースではありません。20万レコード上限と、レコード間の約60秒・合計64MiB確認は協調的制限であり、処理時間の強制上限ではありません。
 
-[詳しい使用方法](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper-independent/independent/README.md) · [テスト結果](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper-independent/independent/TEST_RESULTS.md)
+[詳しい使用方法](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper/independent/README.md) · [テスト結果](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper/independent/TEST_RESULTS.md)
 
 ## ライセンス
 
-v0.2.0 のソースは [0BSD](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper-independent/independent/LICENSE)。公式Zygisk SDKヘッダーの著作権・許諾は保持しています。[外部コードと技術参照](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper-independent/independent/THIRD_PARTY_NOTICES.md)を参照してください。
+v0.2.0 のソースは [0BSD](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper/independent/LICENSE)。公式Zygisk SDKヘッダーの著作権・許諾は保持しています。[外部コードと技術参照](https://github.com/tatuhack/God-All-dumper/blob/pxojdumper/independent/THIRD_PARTY_NOTICES.md)を参照してください。
 
 `main` に保持している以前のソースには、その [LICENSE](LICENSE)、[NOTICE.md](NOTICE.md)、[THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) が適用されます。v0.2.0 のライセンスは旧実装には適用されません。
