@@ -21,7 +21,7 @@ Android 向けの Unity IL2CPP ランタイム解析モジュール。対象ア�
 - 公開 IL2CPP export があり、標準ローダーからアクセス可能な Unity IL2CPP アプリ。
 - ネイティブオフセットの収集には、対象プロセス自身の `/proc/self/mem` と `/proc/self/maps` の読み取りが必要です。拒否された場合は回避せず、そのメソッドのオフセットを取得不可として記録します。
 
-ZIP は Magisk 形式です。KernelSU/APatch のインストール互換性は未検証で、対応を保証しません。WebUI の bridge 対応は、インストーラやランタイムの互換性保証ではありません。通常の非 root Termux 単体では利用できません。
+ZIP は Magisk 形式です。WebUI の bridge 対応は、インストーラやランタイムの互換性保証ではありません。通常の非 root Termux 単体では利用できません。
 
 ## ビルド
 
@@ -101,7 +101,7 @@ python3 -m unittest discover -s tests -v
 node tests/webui_test.mjs
 ```
 
-ホストテストでは、模擬 IL2CPP ランタイムとテスト用 ELF を使用しています。Android 実機へのインストールと Unity ゲーム上での動作は未確認です。ビルド・検証状況は [TEST_RESULTS.md](TEST_RESULTS.md) に記載しています。
+ホストテストでは、模擬 IL2CPP ランタイムとテスト用 ELF を使用しています。すべての環境で動作するかは保証できません。ビルド・検証状況は [TEST_RESULTS.md](TEST_RESULTS.md) に記載しています。
 
 ## ライセンス
 
