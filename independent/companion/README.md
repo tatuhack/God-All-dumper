@@ -1,10 +1,8 @@
 # PXOJ Phantom
 
-**Dump once. Trace live. Change deliberately.**
-
 pxojdumper の JSON から関数を検索し、Frida で呼び出しを観測する CLI コンパニオン。対応する整数・Boolean の引数と戻り値は、明示的に有効化したセッション内で変更できます。
 
-**v0.1.0 / Experimental** — Android 実機・Termux での実行、および実際の IL2CPP ゲームへの接続は未検証です。保護回避、任意型の変更、全ゲーム対応を保証しません。
+バージョン: 0.1.0。Android 実機・Termux での実行と、実際の IL2CPP ゲームへの接続は未確認です。保護回避、任意の型の変更、全ゲームへの対応は対象外です。
 
 ## Features
 
