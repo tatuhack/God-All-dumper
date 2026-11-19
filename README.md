@@ -1,4 +1,4 @@
-# PXOJ Seeker (Offline)
+# PXOJ Seeker
 
 保存済みの pxojdumper ダンプ（Schema 2 JSON）を検索・比較する CLI です。Python 3.9 以降の標準ライブラリだけで動きます。ネットワークや root 権限は不要です。
 
