@@ -184,7 +184,7 @@ python3 tests/live_smoke.py
 
 ## References
 
-- [pxojdumper v0.2](https://github.com/tatuhack/God-All-dumper/tree/pxojdumper-independent)
+- [pxojdumper v0.2](https://github.com/tatuhack/God-All-dumper/tree/pxojdumper)
 - [Frida JavaScript API](https://frida.re/docs/javascript-api/)
 - [Frida 17 API migration](https://frida.re/news/2025/05/17/frida-17-0-0-released/)
 
